@@ -69,7 +69,7 @@ public class WebhookService {
         }
     }
 
-    private String getCurrentWebhookUrl() {
+    public String getCurrentWebhookUrl() {
         try {
             ResponseEntity<String> response = restClient.get()
                     .uri("/bot{token}/getWebhookInfo", botToken)

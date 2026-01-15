@@ -66,8 +66,7 @@ public class TelegramBotService implements TelegramWebhookBot {
     public void init() {
         commandMap.put("/start", this::handleStartCommand);
         commandMap.put("/schedule", this::handleScheduleCommand);
-
-        scheduleWebhookCheck();
+        webhookService.getCurrentWebhookUrl();
     }
 
     private void scheduleWebhookCheck() {
@@ -87,12 +86,20 @@ public class TelegramBotService implements TelegramWebhookBot {
 
     @Override
     public void runDeleteWebhook() {
-        webhookService.deleteWebhook();
+        try {
+            telegramClient.execute(new DeleteWebhook());
+        } catch (TelegramApiException e) {
+            log.info("Error deleting webhook");
+        }
     }
 
     @Override
     public void runSetWebhook() {
-        webhookService.updateWebhook();
+        try {
+            telegramClient.execute(new SetWebhook(url + path));
+        } catch (TelegramApiException e) {
+            log.info("Error setting webhook: {}", String.valueOf(e));
+        }
     }
 
     public boolean sendNotification(String chatId, String message) {
@@ -124,7 +131,7 @@ public class TelegramBotService implements TelegramWebhookBot {
 
         Message message = update.getMessage();
         if (!message.getText().startsWith("/")) {
-            return new SendMessage(message.getChatId().toString(), "You should write a command.");
+            return sendMessage(message.getChatId().toString(), "You should write a command.");
         }
 
         Function<Message, BotApiMethod<?>> handler = commandMap.get(message.getText());
@@ -133,19 +140,36 @@ public class TelegramBotService implements TelegramWebhookBot {
             return handler.apply(message);
         }
 
-        return new SendMessage(message.getChatId().toString(), "Unknown command...");
+        return sendMessage(message.getChatId().toString(), "Unknown command...");
+    }
+
+    public SendMessage sendMessage(String chatId, String text) {
+        SendMessage sendMessage = new SendMessage(chatId, text);
+        try {
+            telegramClient.execute(sendMessage);
+            return sendMessage;
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private BotApiMethod<?> handleStartCommand(Message message) {
         String chatId = message.getChatId().toString();
         String username = message.getFrom().getUserName();
 
-        telegramUserRepository.save(TelegramUser.builder()
+        TelegramUser user = telegramUserRepository.findByChatId(chatId).orElseGet(() -> telegramUserRepository.save(TelegramUser.builder()
                 .username(username)
                 .chatId(chatId)
-                .build());
+                .build()));
 
-        return new SendMessage(chatId, "Привет! Я бот, который поможет тебе забронировать прием у врача.\n"
+        log.info("Message from user with chatId: {}", user.getChatId());
+//
+//        telegramUserRepository.save(TelegramUser.builder()
+//                .username(username)
+//                .chatId(chatId)
+//                .build());
+
+        return sendMessage(chatId, "Привет! Я бот, который поможет тебе забронировать прием у врача.\n"
                 + "Доступные команды:\n"
                 + "/schedule - показать все записи\n"
                 + "/book - создать новую запись");
@@ -156,19 +180,19 @@ public class TelegramBotService implements TelegramWebhookBot {
         TelegramUser user = telegramUserRepository.findByChatId(chatId)
                 .orElse(null);
         if (user == null) {
-            return new SendMessage(chatId, "Сначала зарегистрируйтесь с помощью /start");
+            return sendMessage(chatId, "Сначала зарегистрируйтесь с помощью /start");
         }
 
         List<AppointmentResponseDto> appointments = externalGateway.getTgUserAppointments(user.getId());
         if (appointments.isEmpty()) {
-            return new SendMessage(chatId, "У вас нет запланированных приёмов.");
+            return sendMessage(chatId, "У вас нет запланированных приёмов.");
         }
 
         String schedule = appointments.stream()
                 .map(this::formatAppointment)
                 .collect(Collectors.joining("\n\n"));
 
-        return new SendMessage(chatId, "Ваши записи:\n\n" + schedule);
+        return sendMessage(chatId, "Ваши записи:\n\n" + schedule);
     }
 
     private String formatAppointment(AppointmentResponseDto appointment) {

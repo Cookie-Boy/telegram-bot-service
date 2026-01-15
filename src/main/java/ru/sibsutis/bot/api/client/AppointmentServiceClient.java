@@ -1,11 +1,11 @@
 package ru.sibsutis.bot.api.client;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import ru.sibsutis.bot.api.dto.AppointmentResponseDto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,9 +22,10 @@ public class AppointmentServiceClient extends BaseServiceClient {
     }
 
     public List<AppointmentResponseDto> getTgUserAppointments(UUID tgUserId) {
-        return restClient.get()
-                .uri(getUrl, tgUserId)
-                .retrieve()
-                .body(new ParameterizedTypeReference<>() {});
+        return new ArrayList<>();
+//        return restClient.get()
+//                .uri(getUrl, tgUserId)
+//                .retrieve()
+//                .body(new ParameterizedTypeReference<>() {});
     }
 }

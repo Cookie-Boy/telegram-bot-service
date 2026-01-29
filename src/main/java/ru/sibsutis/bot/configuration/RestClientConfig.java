@@ -10,12 +10,10 @@ import org.springframework.web.client.RestClient;
 public class RestClientConfig {
 
     @Bean
-    public RestClient.Builder restClientBuilder() {
+    public RestClient restClient() {
         return RestClient.builder()
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .requestInterceptor((request, body, execution) -> {
-                    // Можно добавить общую логику (логирование, метрики)
-                    return execution.execute(request, body);
-                });
+                .build();
     }
+
 }

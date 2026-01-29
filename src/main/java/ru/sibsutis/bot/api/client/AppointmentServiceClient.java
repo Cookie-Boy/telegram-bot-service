@@ -1,31 +1,42 @@
 package ru.sibsutis.bot.api.client;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import ru.sibsutis.bot.api.dto.AppointmentResponseDto;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
+@Slf4j
 @Component
 public class AppointmentServiceClient extends BaseServiceClient {
 
-    @Value("${clients.appointment.getUrl}")
+    @Value("${endpoints.appointment.getUrl}")
     private String getUrl;
 
-    public AppointmentServiceClient(RestClient.Builder builder,
-                                    @Value("${clients.appointment.baseUrl}") String url,
-                                    @Value("${clients.appointment.name}") String serviceName) {
-        super(builder, url, serviceName);
+    @Autowired
+    public AppointmentServiceClient(OAuth2AuthorizedClientManager clientManager,
+                                    RestClient restClient,
+                                    @Value("${endpoints.appointment.name}") String serviceName) {
+        super(clientManager, restClient, serviceName);
     }
 
-    public List<AppointmentResponseDto> getTgUserAppointments(UUID tgUserId) {
-        return new ArrayList<>();
-//        return restClient.get()
-//                .uri(getUrl, tgUserId)
-//                .retrieve()
-//                .body(new ParameterizedTypeReference<>() {});
+    public List<AppointmentResponseDto> getTgUserAppointments(String tgUserName) {
+        try {
+            String token = getFreshToken();
+            log.info("Fresh token: {}", token);
+            return restClient.get()
+                    .uri(getUrl, tgUserName)
+                    .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<>() {});
+        } catch (RuntimeException e) {
+            log.error("Failed to send a request to appointment-service: {}", String.valueOf(e));
+            return null;
+        }
     }
 }

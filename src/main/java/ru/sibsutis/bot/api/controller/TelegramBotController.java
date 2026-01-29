@@ -26,7 +26,7 @@ public class TelegramBotController {
 
     // Пользователь что-то написал →
     // Telegram сервер →
-    // Публичный URL Tuna →
+    // Публичный URL Tuna (Тюна) →
     // Spring Boot (localhost:8090/webhook) →
     // Jetty сервер (localhost:9091/webhook) →
     // TelegramBotService.consumeUpdate()
@@ -57,9 +57,9 @@ public class TelegramBotController {
         }
     }
 
-    @PostMapping("/notify/{chatId}")
-    public ResponseEntity<?> notifyUser(@PathVariable String chatId, @RequestBody String text) {
-        boolean result = telegramBotService.sendNotification(chatId, text);
+    @PostMapping("/notify/{tgUserName}")
+    public ResponseEntity<?> notifyUser(@PathVariable String tgUserName, @RequestBody String text) {
+        boolean result = telegramBotService.sendNotification(tgUserName, text);
         return result ? ResponseEntity.ok().build() : ResponseEntity.internalServerError().build();
     }
 }

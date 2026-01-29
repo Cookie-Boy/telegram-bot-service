@@ -102,7 +102,9 @@ public class TelegramBotService implements TelegramWebhookBot {
         }
     }
 
-    public boolean sendNotification(String chatId, String message) {
+    public boolean sendNotification(String username, String message) {
+        TelegramUser user = telegramUserRepository.findByUsername(username);
+        String chatId = user.getChatId();
         SendMessage sendMessage = new SendMessage(chatId, message);
         sendMessage.setChatId(chatId);
         sendMessage.setText(message);
@@ -163,11 +165,6 @@ public class TelegramBotService implements TelegramWebhookBot {
                 .build()));
 
         log.info("Message from user with chatId: {}", user.getChatId());
-//
-//        telegramUserRepository.save(TelegramUser.builder()
-//                .username(username)
-//                .chatId(chatId)
-//                .build());
 
         return sendMessage(chatId, "Привет! Я бот, который поможет тебе забронировать прием у врача.\n"
                 + "Доступные команды:\n"
@@ -183,7 +180,12 @@ public class TelegramBotService implements TelegramWebhookBot {
             return sendMessage(chatId, "Сначала зарегистрируйтесь с помощью /start");
         }
 
-        List<AppointmentResponseDto> appointments = externalGateway.getTgUserAppointments(user.getId());
+        List<AppointmentResponseDto> appointments = externalGateway.getTgUserAppointments("@" + user.getUsername());
+
+        if (appointments == null) {
+            return sendMessage(chatId, "Из-за технических неполадок сервис 'appointments' недоступен, ожидайте...");
+        }
+
         if (appointments.isEmpty()) {
             return sendMessage(chatId, "У вас нет запланированных приёмов.");
         }

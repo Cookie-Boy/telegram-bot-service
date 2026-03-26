@@ -11,8 +11,13 @@ import java.util.List;
 public class ExternalGateway {
 
     private final AppointmentServiceClient appointmentClient;
+    private final ProfileServiceClient profileServiceClient;
 
     public List<AppointmentResponseDto> getTgUserAppointments(String tgUserName) {
         return appointmentClient.getTgUserAppointments(tgUserName);
+    }
+
+    public String getOwnerTgChatId(String petId) {
+        return profileServiceClient.getOwnerTgChatId(petId);
     }
 }

@@ -7,30 +7,30 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import ru.sibsutis.bot.api.dto.AppointmentResponseDto;
-
-import java.util.List;
 
 @Slf4j
 @Component
-public class AppointmentServiceClient extends BaseClient {
+public class ProfileServiceClient extends BaseClient {
 
-    @Value("${service.appointment.url}")
+    @Value("${service.profile.url}")
     private String url;
 
     @Autowired
-    public AppointmentServiceClient(OAuth2AuthorizedClientManager clientManager,
-                                    RestClient restClient,
-                                    @Value("${service.appointment.name}") String targetServiceName) {
+    public ProfileServiceClient(OAuth2AuthorizedClientManager clientManager,
+                                RestClient restClient,
+                                @Value("${service.profile.name}") String targetServiceName) {
         super(clientManager, restClient, targetServiceName);
     }
 
-    public List<AppointmentResponseDto> getTgUserAppointments(String tgUserName) {
+    public String getOwnerTgChatId(String petId) {
         try {
             String token = getFreshToken();
             log.info("Fresh token: {}", token);
             return restClient.get()
-                    .uri(url, tgUserName)
+                    .uri(uriBuilder -> uriBuilder
+                        .path(url)
+                        .queryParam("petId", petId)
+                        .build())
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
                     .retrieve()
                     .body(new ParameterizedTypeReference<>() {});
@@ -40,3 +40,4 @@ public class AppointmentServiceClient extends BaseClient {
         }
     }
 }
+

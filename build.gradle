@@ -18,12 +18,16 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter'
     // Исключаем tomcat сервер, т.к. Telegram использует Jetty
     implementation('org.springframework.boot:spring-boot-starter-web') {
         exclude group: 'org.eclipse.jetty'
     }
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    implementation 'org.springframework.boot:spring-boot-starter-integration'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.integration:spring-integration-mqtt:7.0.3'
+    implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'
+
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
@@ -35,12 +39,12 @@ dependencies {
     implementation 'org.eclipse.jetty:jetty-io:11.0.25'
     implementation 'org.eclipse.jetty:jetty-util:11.0.25'
     implementation 'org.eclipse.jetty:jetty-security:11.0.25'
-
     implementation 'org.telegram:telegrambots-webhook:9.2.1'
     implementation 'org.telegram:telegrambots-client:9.2.1'
 
     implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.6.3'
 
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.liquibase:liquibase-core'
     implementation 'org.postgresql:postgresql'
 

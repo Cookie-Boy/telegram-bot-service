@@ -14,8 +14,8 @@ public class VkBotController {
     private final MessageSender vkMessageSender;
 
     @PostMapping("/notify/{vkUserId}")
-    public ResponseEntity<?> notifyUser(@PathVariable String vkUserId, @RequestBody String text) {
-        boolean result = vkMessageSender.send(Long.parseLong(vkUserId), text);
+    public ResponseEntity<?> notifyUser(@PathVariable Long vkUserId, @RequestBody String text) {
+        boolean result = vkMessageSender.send(vkUserId, text);
         return result ? ResponseEntity.ok().build() : ResponseEntity.internalServerError().build();
     }
 }

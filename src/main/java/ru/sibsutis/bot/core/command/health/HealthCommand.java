@@ -103,7 +103,7 @@ public class HealthCommand implements BotCommand {
         // Расстояние от дома
         if (result.getDistanceFromHome() != null) {
             String mark = !"TOO_FAR_FROM_HOME".equals(result.getAnomalyReason()) ? "🏠" : "⚠️";
-            sb.append(String.format("   %s Расстояние от дома: %.0f м\n", mark, result.getDistanceFromHome()));
+            sb.append(String.format("   %s Расстояние от дома: %.2f м\n", mark, result.getDistanceFromHome()));
         }
 
         // Общий статус аномалии

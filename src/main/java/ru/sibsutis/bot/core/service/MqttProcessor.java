@@ -93,7 +93,7 @@ public class MqttProcessor {
                 message.append("📍 Питомец убежал слишком далеко!\n");
                 Object distance = result.getDetails().get("distance");
                 if (distance != null) {
-                    message.append(String.format("Расстояние от дома: %.0f м\n", ((Number) distance).doubleValue()));
+                    message.append(String.format("Расстояние от дома: %.2f м\n", ((Number) distance).doubleValue()));
                 }
                 message.append("⚠️ Питомец покинул безопасную зону!\n");
                 message.append("📌 Рекомендация: немедленно проверьте местоположение питомца по GPS.\n");

@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="90846972-f86f-4d94-b624-87e8093200f0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/sibsutis/bot/api/controller/VkBotController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/sibsutis/bot/api/controller/VkBotController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
